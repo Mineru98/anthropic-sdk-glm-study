@@ -1,14 +1,21 @@
 import { query } from "@anthropic-ai/claude-agent-sdk";
+import { agentConfig } from "@core";
 
-// Agentic loop: streams messages as Claude works
 for await (const message of query({
-  prompt: "현재 어떤 폴더들이 있나요?",
+  prompt: "현재 사용 가능한 스킬들은?",
   options: {
-    allowedTools: ["Read", "Edit", "Glob"], // Tools Claude can use
-    permissionMode: "acceptEdits", // Auto-approve file edits
+    allowedTools: ["Read", "Edit", "Glob", "Agent"],
+    settingSources: ["user", "project"],
+    permissionMode: "bypassPermissions",
+    model: agentConfig.model || "glm-4.7",
+    env: {
+      ANTHROPIC_AUTH_TOKEN: agentConfig.apiKey,
+      ANTHROPIC_BASE_URL: agentConfig.baseUrl,
+      API_TIMEOUT_MS: String(agentConfig.apiTimeoutMs),
+      ANTHROPIC_DEFAULT_SONNET_MODEL: agentConfig.model || "glm-4.7",
+    },
   },
 })) {
-  // Print human-readable output
   if (message.type === "assistant" && message.message?.content) {
     for (const block of message.message.content) {
       if ("text" in block) {
