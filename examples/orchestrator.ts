@@ -26,12 +26,12 @@ async function main() {
       settingSources: ["user", "project"],
       permissionMode: "bypassPermissions",
       allowDangerouslySkipPermissions: true,
-      model: agentConfig.model || "glm-4.7",
+      model: agentConfig.model || "glm-5.2",
       env: {
         ANTHROPIC_AUTH_TOKEN: agentConfig.apiKey,
         ANTHROPIC_BASE_URL: agentConfig.baseUrl,
         API_TIMEOUT_MS: String(agentConfig.apiTimeoutMs),
-        ANTHROPIC_DEFAULT_SONNET_MODEL: agentConfig.model || "glm-4.7",
+        ANTHROPIC_DEFAULT_SONNET_MODEL: agentConfig.model || "glm-5.2",
       },
     },
   })) {

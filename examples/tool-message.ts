@@ -23,7 +23,7 @@ async function main() {
         content: "오늘 부산 날씨 어때?",
       },
     ],
-    model: agentConfig.model || "glm-4.7",
+    model: agentConfig.model || "glm-5.2",
     tools: [weatherTool],
   });
 

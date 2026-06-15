@@ -12,7 +12,7 @@ async function main() {
         content: "안녕, GLM",
       },
     ],
-    model: agentConfig.model || "glm-4.7",
+    model: agentConfig.model || "glm-5.2",
   });
 
   // content는 ContentBlock 배열 (text 타입)
