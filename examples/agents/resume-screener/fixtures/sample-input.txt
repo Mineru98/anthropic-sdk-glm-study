@@ -1,0 +1,2 @@
+[JD] 백엔드 개발자. 필수: Node.js 3년+, SQL, REST API. 우대: AWS, Docker.
+[이력서] 김OO. Node.js 4년, PostgreSQL 사용, REST/GraphQL API 설계. Docker 경험 있음. AWS 미사용.

@@ -1,0 +1,1 @@
+function run(input){ let out=""; for(let i=0;i<items.length;i++){ out+=items[i]; } return eval(input); }

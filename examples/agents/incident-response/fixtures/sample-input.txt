@@ -1,0 +1,1 @@
+API 5xx 비율이 1%→40%로 급증, p99 지연 3s→30s. 로그: "FATAL: remaining connection slots are reserved", "DB connection pool exhausted". 30분 전 트래픽 2배 증가 이벤트 진행 중.

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>Agent Demo Terminal</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css" />
+    <style>
+      html, body { margin: 0; height: 100%; background: #0b0e14; font-family: ui-monospace, monospace; }
+      #wrap { position: relative; width: 100vw; height: 100vh; box-sizing: border-box; padding: 16px 16px 90px; }
+      #term { width: 100%; height: 100%; }
+      #subtitle {
+        position: absolute; left: 0; right: 0; bottom: 18px;
+        display: flex; justify-content: center; pointer-events: none;
+      }
+      #subtitle span {
+        background: rgba(0,0,0,0.78); color: #fff; font-size: 20px; line-height: 1.5;
+        padding: 10px 20px; border-radius: 10px; max-width: 90%; text-align: center;
+        font-family: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.5); transition: opacity .2s;
+      }
+      #badge {
+        position: absolute; top: 18px; right: 22px; color: #c9a2ff;
+        font-family: -apple-system, "Noto Sans KR", sans-serif; font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="term"></div>
+      <div id="badge"></div>
+      <div id="subtitle"><span id="subtitle-text" style="opacity:0"></span></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
+    <script>
+      // Playwright가 읽는 상태/자막 큐
+      window.__done = false;
+      window.__cues = []; // { start: ms(페이지 기준), text }
+      const t0 = performance.now();
+
+      const term = new window.Terminal({
+        fontSize: 15,
+        fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+        theme: { background: "#0b0e14", foreground: "#d6deeb" },
+        cols: 110, rows: 30, cursorBlink: true, scrollback: 2000,
+      });
+      const fit = new window.FitAddon.FitAddon();
+      term.loadAddon(fit);
+      term.open(document.getElementById("term"));
+      try { fit.fit(); } catch (e) {}
+
+      const subEl = document.getElementById("subtitle-text");
+      function showSubtitle(text) {
+        subEl.textContent = text;
+        subEl.style.opacity = "1";
+        window.__cues.push({ start: performance.now() - t0, text });
+      }
+
+      const params = new URLSearchParams(location.search);
+      const sample = params.get("sample") || "ko-spellcheck";
+      const input = params.get("input") || "";
+      const wsUrl = `ws://${location.host}/?sample=${encodeURIComponent(sample)}` +
+        (input ? `&input=${encodeURIComponent(input)}` : "");
+      const ws = new WebSocket(wsUrl);
+
+      ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.type === "term") term.write(msg.data);
+        else if (msg.type === "subtitle") showSubtitle(msg.text);
+        else if (msg.type === "meta")
+          document.getElementById("badge").textContent =
+            `${msg.industry} · ${msg.pattern}`;
+        else if (msg.type === "done") {
+          // 마지막 자막을 잠시 유지한 뒤 종료 신호
+          setTimeout(() => { window.__done = true; }, 1500);
+        }
+      };
+      ws.onerror = () => { window.__done = true; };
+    </script>
+  </body>
+</html>
